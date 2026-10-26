@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 import { 
   INITIAL_CUSTOMERS, 
   INITIAL_MACHINES, 
@@ -562,9 +563,41 @@ export function findUserByEmail(email) {
   return row || null;
 }
 
+export function hashPassword(plainPassword) {
+  if (!plainPassword) return '';
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.scryptSync(plainPassword, salt, 64).toString('hex');
+  return `scrypt:${salt}:${hash}`;
+}
+
+export function verifyPassword(plainPassword, storedPassword) {
+  if (!storedPassword || !plainPassword) return false;
+  // Support legacy plain text with auto-upgrade
+  if (!storedPassword.startsWith('scrypt:')) {
+    return storedPassword === plainPassword;
+  }
+  try {
+    const parts = storedPassword.split(':');
+    if (parts.length !== 3) return false;
+    const salt = parts[1];
+    const originalHash = parts[2];
+    const hash = crypto.scryptSync(plainPassword, salt, 64).toString('hex');
+    return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(originalHash, 'hex'));
+  } catch (err) {
+    return false;
+  }
+}
+
 export function registerUser({ email, password, name, role = 'owner' }) {
   const db = getDb();
-  const cleanEmail = String(email || '').trim().toLowerCase();
+  const cleanEmail = String(email || '').trim().toLowerCase().slice(0, 120);
+  if (!cleanEmail) {
+    return { error: 'invalid_email', message: 'Email or Mobile is required.' };
+  }
+  if (!password || String(password).length < 4) {
+    return { error: 'weak_password', message: 'Password must be at least 4 characters long.' };
+  }
+
   const existing = findUserByEmail(cleanEmail);
   if (existing) {
     return { 
@@ -574,13 +607,15 @@ export function registerUser({ email, password, name, role = 'owner' }) {
   }
 
   const id = `usr-${Date.now()}`;
-  const userName = String(name || cleanEmail.split('@')[0] || 'User').trim();
+  const userName = String(name || cleanEmail.split('@')[0] || 'User').trim().slice(0, 100);
+  const hashedPassword = hashPassword(String(password));
+
   const stmt = db.prepare(`
     INSERT INTO users (id, email, password, name, role)
     VALUES (?, ?, ?, ?, ?)
   `);
 
-  stmt.run(id, cleanEmail, String(password || ''), userName, String(role));
+  stmt.run(id, cleanEmail, hashedPassword, userName, String(role).slice(0, 30));
 
   return {
     success: true,
@@ -595,7 +630,8 @@ export function registerUser({ email, password, name, role = 'owner' }) {
 }
 
 export function authenticateUser(email, password) {
-  const cleanEmail = String(email || '').trim().toLowerCase();
+  const db = getDb();
+  const cleanEmail = String(email || '').trim().toLowerCase().slice(0, 120);
   const user = findUserByEmail(cleanEmail);
   if (!user) {
     return { 
@@ -604,11 +640,21 @@ export function authenticateUser(email, password) {
     };
   }
 
-  if (user.password !== String(password || '')) {
+  const isMatch = verifyPassword(String(password || ''), user.password);
+  if (!isMatch) {
     return { 
       error: 'invalid_credentials', 
       message: 'Incorrect password or PIN. Please try again.' 
     };
+  }
+
+  // Automatic security upgrade: hash plain text legacy password
+  if (!user.password.startsWith('scrypt:')) {
+    try {
+      db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashPassword(String(password)), user.id);
+    } catch (e) {
+      console.warn('Password hash upgrade warning:', e);
+    }
   }
 
   return {
