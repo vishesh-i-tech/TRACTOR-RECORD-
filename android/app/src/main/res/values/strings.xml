@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Tractor Record</string>
+    <string name="title_activity_main">Tractor Record</string>
+    <string name="package_name">com.tractorrecord.app</string>
+    <string name="custom_url_scheme">com.tractorrecord.app</string>
+</resources>
