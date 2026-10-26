@@ -19,7 +19,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function AuthView({ onOpenSupabaseConfig }) {
-  const { signIn, signUp, demoLogin, isSupabaseLive } = useAuth();
+  const { signIn, signUp, isSupabaseLive } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const [tab, setTab] = useState('login'); // 'login' | 'signup'
   const [email, setEmail] = useState('');
@@ -29,34 +29,58 @@ export default function AuthView({ onOpenSupabaseConfig }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [isAlreadyExisting, setIsAlreadyExisting] = useState(false);
+  const [isNotFound, setIsNotFound] = useState(false);
+
+  const switchToLogin = () => {
+    setTab('login');
+    setError('');
+    setSuccessMsg('');
+    setIsAlreadyExisting(false);
+    setIsNotFound(false);
+  };
+
+  const switchToSignup = () => {
+    setTab('signup');
+    setError('');
+    setSuccessMsg('');
+    setIsAlreadyExisting(false);
+    setIsNotFound(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccessMsg('');
+    setIsAlreadyExisting(false);
+    setIsNotFound(false);
     setLoading(true);
 
     try {
       if (tab === 'login') {
         await signIn(email, password);
-        setSuccessMsg(language === 'hi' ? 'सफलतापूर्वक लॉग इन हुआ!' : 'Successfully signed in! Opening dashboard...');
+        setSuccessMsg(language === 'hi' ? 'सफलतापूर्वक प्रवेश!' : 'Signed in! Opening dashboard...');
       } else {
+        if (!fullName.trim()) {
+          setError(language === 'hi' ? 'कृपया अपना नाम दर्ज करें' : 'Please enter your name');
+          setLoading(false);
+          return;
+        }
         await signUp(email, password, fullName, role);
-        setSuccessMsg(language === 'hi' ? 'खाता सफलतापूर्वक बनाया गया!' : 'Account created successfully! Welcome to Tractor Record.');
+        setSuccessMsg(language === 'hi' ? 'खाता तैयार!' : 'Account registered successfully!');
       }
     } catch (err) {
-      setError(err.message || (language === 'hi' ? 'प्रमाणीकरण त्रुटि। कृपया क्रेडेंशियल जांचें।' : 'Authentication error. Please check your credentials.'));
+      const msg = err.message || (language === 'hi' ? 'प्रमाणीकरण त्रुटि' : 'Authentication error. Please check credentials.');
+      setError(msg);
+      if (err.alreadyExists || err.code === 'already_exists' || msg.toLowerCase().includes('already exist')) {
+        setIsAlreadyExisting(true);
+      }
+      if (err.notFound || err.code === 'user_not_found' || msg.toLowerCase().includes('not found')) {
+        setIsNotFound(true);
+      }
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDemoSelect = (roleName) => {
-    setError('');
-    setSuccessMsg(language === 'hi' ? `डेमो खाते में प्रवेश किया जा रहा है...` : `Signing in as demo ${roleName}...`);
-    setTimeout(() => {
-      demoLogin(roleName);
-    }, 200);
   };
 
   return (
@@ -92,41 +116,25 @@ export default function AuthView({ onOpenSupabaseConfig }) {
         <p className="auth-brand-subtitle">
           {t('tagline', 'Rural Fleet & Khata Management')}
         </p>
-
-        {/* Database Status Pill */}
-        <div className="auth-db-pill-bar">
-          <div 
-            onClick={onOpenSupabaseConfig}
-            className={`auth-db-status-badge ${isSupabaseLive ? 'live' : 'offline'}`}
-            title="Click to view or edit Supabase credentials"
-          >
-            <Database style={{ width: 13, height: 13 }} />
-            <span className="auth-db-indicator-dot" />
-            <span>{isSupabaseLive ? t('liveDb', 'Live Supabase DB') : t('demoMode', 'Local / Demo Mode')}</span>
-            <span style={{ fontSize: '0.68rem', opacity: 0.7, textDecoration: 'underline', marginLeft: 4 }}>
-              ⚙️ {t('settings', 'Settings')}
-            </span>
-          </div>
-        </div>
       </div>
 
       {/* Main Authentication Card */}
       <div className="auth-form-card">
-        {/* Tab Switcher */}
+        {/* Tab Switcher: Sign In & Sign Up */}
         <div className="auth-tab-bar">
           <button
             type="button"
-            onClick={() => { setTab('login'); setError(''); setSuccessMsg(''); }}
+            onClick={switchToLogin}
             className={`auth-tab-btn ${tab === 'login' ? 'active' : ''}`}
           >
-            {t('signInTab', 'Sign In')}
+            {language === 'hi' ? 'साइन इन' : 'Sign In'}
           </button>
           <button
             type="button"
-            onClick={() => { setTab('signup'); setError(''); setSuccessMsg(''); }}
+            onClick={switchToSignup}
             className={`auth-tab-btn ${tab === 'signup' ? 'active' : ''}`}
           >
-            {t('createAccountTab', 'Create Account')}
+            {language === 'hi' ? 'साइन अप' : 'Sign Up'}
           </button>
         </div>
 
@@ -134,67 +142,113 @@ export default function AuthView({ onOpenSupabaseConfig }) {
         <form onSubmit={handleSubmit} className="auth-input-form">
           {tab === 'signup' && (
             <>
-              <div className="auth-form-group">
-                <label className="auth-input-label">{t('fullName', 'Full Name')}</label>
-                <div className="auth-input-wrapper">
-                  <User style={{ width: 17, height: 17, color: '#94a3b8' }} />
+              <div className="auth-field-group">
+                <label className="auth-field-label">
+                  <User style={{ width: 14, height: 14, color: '#2563eb' }} />
+                  <span>{language === 'hi' ? 'पूरा नाम' : 'Full Name'}</span>
+                </label>
+                <div className="auth-input-box">
                   <input
                     type="text"
-                    placeholder={t('fullNamePlaceholder', 'e.g. Surinder Thakur')}
+                    required
+                    placeholder={language === 'hi' ? 'पूरा नाम' : 'Full Name'}
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    required
+                    className="auth-input-field"
                   />
                 </div>
               </div>
 
-              <div className="auth-form-group">
-                <label className="auth-input-label">{t('accountRole', 'Account Role')}</label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="auth-select-field"
-                >
-                  <option value="owner">👑 {t('roleOwner', 'Farm & Fleet Owner')}</option>
-                  <option value="munshi">📋 {t('roleMunshi', 'Accountant (Munshi)')}</option>
-                  <option value="driver">🚜 {t('roleDriver', 'Machine Driver / Operator')}</option>
-                </select>
+              <div className="auth-field-group">
+                <label className="auth-field-label">
+                  <Tractor style={{ width: 14, height: 14, color: '#2563eb' }} />
+                  <span>{language === 'hi' ? 'भूमिका' : 'Role'}</span>
+                </label>
+                <div className="auth-role-select-grid">
+                  <button
+                    type="button"
+                    onClick={() => setRole('owner')}
+                    className={`auth-role-pill-btn ${role === 'owner' ? 'active' : ''}`}
+                  >
+                    👑 {language === 'hi' ? 'मालिक' : 'Owner'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRole('munshi')}
+                    className={`auth-role-pill-btn ${role === 'munshi' ? 'active' : ''}`}
+                  >
+                    📋 {language === 'hi' ? 'मुंशी' : 'Munshi'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRole('driver')}
+                    className={`auth-role-pill-btn ${role === 'driver' ? 'active' : ''}`}
+                  >
+                    🚜 {language === 'hi' ? 'ड्राइवर' : 'Driver'}
+                  </button>
+                </div>
               </div>
             </>
           )}
 
-          <div className="auth-form-group">
-            <label className="auth-input-label">{t('email', 'Email Address')}</label>
-            <div className="auth-input-wrapper">
-              <Mail style={{ width: 17, height: 17, color: '#94a3b8' }} />
+          <div className="auth-field-group">
+            <label className="auth-field-label">
+              <Mail style={{ width: 14, height: 14, color: '#2563eb' }} />
+              <span>{language === 'hi' ? 'ईमेल या मोबाइल' : 'Email or Mobile'}</span>
+            </label>
+            <div className="auth-input-box">
               <input
-                type="email"
-                placeholder={tab === 'login' ? 'surinder@tractorrecord.com' : 'your.email@example.com'}
+                type="text"
+                required
+                placeholder={language === 'hi' ? 'ईमेल या मोबाइल नंबर' : 'Email or Mobile Number'}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
+                className="auth-input-field"
               />
             </div>
           </div>
 
-          <div className="auth-form-group">
-            <label className="auth-input-label">{t('password', 'Password')}</label>
-            <div className="auth-input-wrapper">
-              <Lock style={{ width: 17, height: 17, color: '#94a3b8' }} />
+          <div className="auth-field-group">
+            <label className="auth-field-label">
+              <Lock style={{ width: 14, height: 14, color: '#2563eb' }} />
+              <span>{language === 'hi' ? 'पासवर्ड या पिन' : 'Password or PIN'}</span>
+            </label>
+            <div className="auth-input-box">
               <input
                 type="password"
+                required
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
+                className="auth-input-field"
               />
             </div>
           </div>
 
           {error && (
-            <div className="auth-alert-box error">
-              <AlertCircle style={{ width: 16, height: 16, flexShrink: 0 }} />
-              <span>{error}</span>
+            <div className="auth-alert-box error" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <AlertCircle style={{ width: 16, height: 16, flexShrink: 0 }} />
+                <span>{error}</span>
+              </div>
+              {isAlreadyExisting && (
+                <button
+                  type="button"
+                  onClick={switchToLogin}
+                  className="auth-inline-action-btn"
+                >
+                  👉 {language === 'hi' ? 'साइन इन करें (पहले से खाता है)' : 'Sign In as existing user'} →
+                </button>
+              )}
+              {isNotFound && (
+                <button
+                  type="button"
+                  onClick={switchToSignup}
+                  className="auth-inline-action-btn"
+                >
+                  👉 {language === 'hi' ? 'नया खाता बनाएं (साइन अप)' : 'Create new account (Sign Up)'} →
+                </button>
+              )}
             </div>
           )}
 
@@ -211,79 +265,57 @@ export default function AuthView({ onOpenSupabaseConfig }) {
             className="auth-submit-btn"
           >
             {loading ? (
-              <span>{t('authenticating', 'Authenticating...')}</span>
+              <span>{language === 'hi' ? 'प्रतीक्षा करें...' : 'Processing...'}</span>
             ) : (
               <>
-                <span>{tab === 'login' ? t('signInButton', 'Sign In to Dashboard') : t('createAccountButton', 'Create Account & Enter')}</span>
+                <span>{tab === 'login' ? (language === 'hi' ? 'साइन इन' : 'Sign In') : (language === 'hi' ? 'साइन अप' : 'Sign Up')}</span>
                 <ArrowRight style={{ width: 16, height: 16 }} />
               </>
             )}
           </button>
+
+          {/* Quick toggle between existing user and new user */}
+          <div className="auth-switch-prompt">
+            {tab === 'signup' ? (
+              <>
+                <span>{language === 'hi' ? 'पहले से खाता है?' : 'Already existing user?'}</span>{' '}
+                <button
+                  type="button"
+                  onClick={switchToLogin}
+                  className="auth-switch-link-btn"
+                >
+                  {language === 'hi' ? 'साइन इन' : 'Sign In'}
+                </button>
+              </>
+            ) : (
+              <>
+                <span>{language === 'hi' ? 'नया खाता बनाना है?' : 'New user?'}</span>{' '}
+                <button
+                  type="button"
+                  onClick={switchToSignup}
+                  className="auth-switch-link-btn"
+                >
+                  {language === 'hi' ? 'साइन अप' : 'Sign Up'}
+                </button>
+              </>
+            )}
+          </div>
         </form>
-
-        {/* 1-Click Instant Demo Login Strip */}
-        <div className="auth-demo-section">
-          <div className="auth-demo-divider">
-            <span>{t('orTestInstantly', 'OR TEST INSTANTLY (1-CLICK DEMO)')}</span>
-          </div>
-
-          <div className="auth-demo-cards-grid">
-            <button
-              type="button"
-              onClick={() => handleDemoSelect('owner')}
-              className="auth-demo-card owner"
-            >
-              <div className="demo-card-avatar">👑 ST</div>
-              <div className="demo-card-content">
-                <div className="demo-card-name">Surinder Thakur</div>
-                <div className="demo-card-role">{t('roleOwner', 'Farm & Fleet Owner')}</div>
-                <div className="demo-card-hint">{t('ownerHint', 'Full Financials & Khata Ledger')}</div>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleDemoSelect('munshi')}
-              className="auth-demo-card munshi"
-            >
-              <div className="demo-card-avatar munshi">📋 RS</div>
-              <div className="demo-card-content">
-                <div className="demo-card-name">Radhe Shyam</div>
-                <div className="demo-card-role">{t('roleMunshi', 'Accountant (Munshi)')}</div>
-                <div className="demo-card-hint">{t('munshiHint', 'Field Logs, Diesel & Barter')}</div>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleDemoSelect('driver')}
-              className="auth-demo-card driver"
-            >
-              <div className="demo-card-avatar driver">🚜 SS</div>
-              <div className="demo-card-content">
-                <div className="demo-card-name">Sukhwinder Singh</div>
-                <div className="demo-card-role">{t('roleDriver', 'Machine Driver / Operator')}</div>
-                <div className="demo-card-hint">{t('driverHint', 'Anti-Tamper Meter & Photo Proof')}</div>
-              </div>
-            </button>
-          </div>
-        </div>
-
       </div>
 
       {/* Feature Highlights Footer */}
       <div className="auth-view-footer">
         <div className="auth-feature-tag">
           <ShieldCheck style={{ width: 14, height: 14, color: '#10b981' }} />
-          <span>{t('antiTamperGps', 'Anti-Tamper GPS')}</span>
+          <span>Anti-Tamper GPS</span>
         </div>
         <div className="auth-feature-tag">
           <Sparkles style={{ width: 14, height: 14, color: '#8b5cf6' }} />
-          <span>{t('voiceAi', 'Voice AI')}</span>
+          <span>Voice AI</span>
         </div>
         <div className="auth-feature-tag">
           <FileSpreadsheet style={{ width: 14, height: 14, color: '#2563eb' }} />
-          <span>{t('whatsappKhata', 'WhatsApp Khata')}</span>
+          <span>WhatsApp Khata</span>
         </div>
       </div>
     </div>

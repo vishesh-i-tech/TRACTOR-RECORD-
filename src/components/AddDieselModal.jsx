@@ -16,19 +16,25 @@ export default function AddDieselModal({
   machines, 
   onSaveDiesel 
 }) {
-  const [machineId, setMachineId] = useState(machines[0]?.id || 'm1');
-  const [liters, setLiters] = useState(45);
-  const [ratePerLiter, setRatePerLiter] = useState(94.5);
-  const [pumpName, setPumpName] = useState('HPCL Rural Kisan Outlet, Pipariya');
-  const [meterReading, setMeterReading] = useState(1842.5);
+  const [machineId, setMachineId] = useState(machines[0]?.id || '');
+  const [liters, setLiters] = useState(40);
+  const [ratePerLiter, setRatePerLiter] = useState(95);
+  const [pumpName, setPumpName] = useState('');
+  const [meterReading, setMeterReading] = useState(machines[0]?.currentMeter || 0);
 
   if (!isOpen) return null;
 
-  const selectedMachine = machines.find(m => m.id === machineId) || machines[0];
+  const selectedMachine = machines.find(m => m.id === machineId) || machines[0] || {
+    id: 'm1',
+    name: 'Tractor Fleet',
+    expectedBurnRate: 4.5,
+    fuelCapacity: 60
+  };
   const totalCost = Math.round(liters * ratePerLiter);
 
+  const benchmarkRate = selectedMachine?.expectedBurnRate || 4.5;
   const simulatedBurnRate = (liters / 7.5).toFixed(1);
-  const isAnomaly = simulatedBurnRate > selectedMachine.expectedBurnRate * 1.25;
+  const isAnomaly = simulatedBurnRate > benchmarkRate * 1.25;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -45,7 +51,7 @@ export default function AddDieselModal({
         meterReadingAtFill: parseFloat(meterReading),
         receiptPhoto: true,
         consumptionStatus: isAnomaly 
-          ? `⚠️ Anomaly (${simulatedBurnRate} L/hr vs ${selectedMachine.expectedBurnRate} L/hr benchmark) - Theft Alert` 
+          ? `⚠️ Anomaly (${simulatedBurnRate} L/hr vs ${benchmarkRate} L/hr benchmark) - Theft Alert` 
           : `Normal (${simulatedBurnRate} L/hr)`,
         anomalyAlert: isAnomaly
       });
@@ -77,7 +83,7 @@ export default function AddDieselModal({
 
         {/* Big Amount Card */}
         <div style={{ background: '#fffbeb', borderRadius: 20, padding: '18px 16px', border: '1px solid #fef3c7', textAlign: 'center', marginBottom: 18 }}>
-          <div style={{ fontSize: '0.75rem', color: '#b45309', textTransform: 'uppercase', fontWeight: 600 }}>Total Fuel Expense</div>
+          <div style={{ fontSize: '0.75rem', color: '#b45309', fontWeight: 600 }}>Total Fuel Expense</div>
           <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#92400e', fontFamily: 'var(--font-mono)' }}>
             ₹{totalCost.toLocaleString('en-IN')}
           </div>
@@ -95,11 +101,15 @@ export default function AddDieselModal({
               onChange={(e) => setMachineId(e.target.value)}
               style={{ width: '100%', padding: '10px 12px', borderRadius: 10, background: '#ffffff', border: '1px solid #cbd5e1', color: '#0f172a', fontSize: '0.8rem', outline: 'none' }}
             >
-              {machines.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name} (Benchmark: {m.expectedBurnRate} L/hr)
-                </option>
-              ))}
+              {machines.length === 0 ? (
+                <option value="m1">Tractor Fleet (Benchmark: 4.5 L/hr)</option>
+              ) : (
+                machines.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name} (Benchmark: {m.expectedBurnRate || 4.5} L/hr)
+                  </option>
+                ))
+              )}
             </select>
           </div>
 
@@ -134,6 +144,7 @@ export default function AddDieselModal({
               <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#475569', display: 'block', marginBottom: 4 }}>Petrol Pump Name</label>
               <input
                 type="text"
+                placeholder="Petrol Pump Name"
                 value={pumpName}
                 onChange={(e) => setPumpName(e.target.value)}
                 style={{ width: '100%', padding: '10px 12px', borderRadius: 10, background: '#ffffff', border: '1px solid #cbd5e1', color: '#0f172a', fontSize: '0.8rem', outline: 'none' }}

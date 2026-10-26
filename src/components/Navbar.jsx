@@ -26,6 +26,7 @@ export default function Navbar({
   openVoiceModal,
   onOpenAuth,
   onOpenSupabaseConfig,
+  onOpenSqliteInfo,
   totalAlerts = 1 
 }) {
   const { user, isSupabaseLive, signOut } = useAuth();
@@ -38,75 +39,27 @@ export default function Navbar({
       <div 
         className="user-profile-group" 
         onClick={onOpenAuth}
-        style={{ cursor: 'pointer' }}
-        title="Settings & Switch Account (सेटिंग्स व खाता बदलें)"
+        style={{ cursor: 'pointer', maxWidth: '50%' }}
+        title="Settings & Account"
       >
-        <div className="profile-avatar" style={{ position: 'relative' }}>
-          {user?.avatar || 'ST'}
-          {isSupabaseLive && (
-            <span 
-              style={{
-                position: 'absolute',
-                bottom: -2,
-                right: -2,
-                width: 12,
-                height: 12,
-                borderRadius: '50%',
-                background: '#10b981',
-                border: '2px solid #ffffff'
-              }}
-              title="Supabase Auth & DB active"
-            />
-          )}
+        <div className="profile-avatar" style={{ width: 38, height: 38, fontSize: '0.88rem' }}>
+          {user?.avatar || (user?.name ? user.name.substring(0, 2).toUpperCase() : 'TR')}
         </div>
-        <div>
-          <div className="user-welcome-label" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span>{language === 'hi' ? 'स्वागत है,' : 'Welcome back,'}</span>
-            <span style={{ fontSize: '0.65rem', color: '#2563eb', fontWeight: 700, textTransform: 'capitalize' }}>
-              ({user?.role || currentRole})
-            </span>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.2 }}>
+            {user?.name || (language === 'hi' ? 'खाता' : 'Account')}
           </div>
-          <div className="user-name-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span>{user?.name || 'Surinder Thakur'}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+            <span style={{ fontSize: '0.65rem', color: '#2563eb', fontWeight: 700, textTransform: 'capitalize', background: '#eff6ff', padding: '1px 6px', borderRadius: 999 }}>
+              {user?.role || currentRole || 'Owner'}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Header action controls */}
-      <div className="header-controls" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div className="header-controls" style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
         
-        {/* Supabase DB Connection Pill */}
-        <button
-          onClick={onOpenSupabaseConfig}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 5,
-            padding: '5px 9px',
-            borderRadius: 999,
-            border: isSupabaseLive ? '1px solid #a7f3d0' : '1px solid #e2e8f0',
-            background: isSupabaseLive ? '#ecfdf5' : '#f8fafc',
-            color: isSupabaseLive ? '#065f46' : '#64748b',
-            cursor: 'pointer',
-            fontSize: '0.72rem',
-            fontWeight: 700,
-            transition: 'all 0.15s ease'
-          }}
-          title={isSupabaseLive ? 'Supabase DB Connected! Click to view config' : 'Connect to Supabase DB'}
-        >
-          <Database style={{ width: 13, height: 13, color: isSupabaseLive ? '#10b981' : '#64748b' }} />
-          <span style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: isSupabaseLive ? '#10b981' : '#f59e0b',
-            display: 'inline-block'
-          }} />
-          <span className="hidden-mobile-sm">
-            {isSupabaseLive ? 'DB Connected' : 'Connect DB'}
-          </span>
-        </button>
-
         {/* Language Switch Toggle (English / हिंदी) */}
         <div style={{ display: 'flex', background: '#f1f5f9', padding: 2, borderRadius: 999, border: '1px solid #e2e8f0' }}>
           <button

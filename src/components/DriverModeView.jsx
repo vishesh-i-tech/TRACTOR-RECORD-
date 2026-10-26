@@ -10,16 +10,16 @@ import {
 } from 'lucide-react';
 
 export default function DriverModeView({ 
-  machines, 
+  machines = [], 
   onSaveDriverJob, 
-  currentDriver = { name: "Sukhwinder Singh", phone: "+91 98765 43210", dailyBhatta: 300, hoursToday: 6.5 } 
+  currentDriver = { name: "Driver / Operator", phone: "", dailyBhatta: 0, hoursToday: 0 } 
 }) {
-  const [selectedMachineId, setSelectedMachineId] = useState(machines[0]?.id || 'm1');
-  const [implement, setImplement] = useState('Rotavator (Shaktiman 7ft)');
+  const [selectedMachineId, setSelectedMachineId] = useState(machines[0]?.id || '');
+  const [implement, setImplement] = useState('');
   const [farmerName, setFarmerName] = useState('');
   const [villageName, setVillageName] = useState('');
-  const [startMeter, setStartMeter] = useState(1842.5);
-  const [endMeter, setEndMeter] = useState(1846.5);
+  const [startMeter, setStartMeter] = useState(machines[0]?.currentMeter || 0);
+  const [endMeter, setEndMeter] = useState(machines[0]?.currentMeter || 0);
   const [submitted, setSubmitted] = useState(false);
 
   const selectedMachine = machines.find(m => m.id === selectedMachineId) || machines[0];
@@ -156,7 +156,7 @@ export default function DriverModeView({
               </label>
               <input
                 type="text"
-                placeholder="e.g. Ramesh Patel"
+                placeholder="Customer Name"
                 value={farmerName}
                 onChange={(e) => setFarmerName(e.target.value)}
                 style={{ width: '100%', padding: '10px 12px', borderRadius: 10, background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }}
@@ -170,7 +170,7 @@ export default function DriverModeView({
               </label>
               <input
                 type="text"
-                placeholder="e.g. Pipariya (Plot 14)"
+                placeholder="Village / Location"
                 value={villageName}
                 onChange={(e) => setVillageName(e.target.value)}
                 style={{ width: '100%', padding: '10px 12px', borderRadius: 10, background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }}

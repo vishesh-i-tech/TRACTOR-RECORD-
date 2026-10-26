@@ -21,8 +21,8 @@ export default function CustomerKhataModal({
   const [showAddPayment, setShowAddPayment] = useState(false);
   const [payAmount, setPayAmount] = useState('');
   const [payMode, setPayMode] = useState('UPI');
-  const [barterItem, setBarterItem] = useState('Wheat');
-  const [barterQuintals, setBarterQuintals] = useState('2');
+  const [barterItem, setBarterItem] = useState('');
+  const [barterQuintals, setBarterQuintals] = useState('');
 
   if (!isOpen || !customer) return null;
 

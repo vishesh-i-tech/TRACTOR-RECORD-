@@ -60,18 +60,43 @@ export default function FleetHealthView({ machines, onAddServiceNote, onOpenAddM
             <span>{language === 'hi' ? '+ नई मशीन जोड़ें' : '+ Add Machine'}</span>
           </button>
 
-          <span className="badge-soft-amber" style={{ padding: '6px 12px', borderRadius: 999, fontSize: '0.72rem', fontWeight: 700 }}>
-            {machines.filter(m => m.serviceHoursLeft <= 20).length || 1} {language === 'hi' ? 'सर्विस बाकी' : 'Service Due'}
-          </span>
-          <span className="badge-soft-rose" style={{ padding: '6px 12px', borderRadius: 999, fontSize: '0.72rem', fontWeight: 700 }}>
-            1 {language === 'hi' ? 'बीमा नवीनीकरण' : 'Insurance Renewal Near'}
-          </span>
+          {machines.filter(m => (m.serviceHoursLeft || 100) <= 20).length > 0 && (
+            <span className="badge-soft-amber" style={{ padding: '6px 12px', borderRadius: 999, fontSize: '0.72rem', fontWeight: 700 }}>
+              {machines.filter(m => (m.serviceHoursLeft || 100) <= 20).length} {language === 'hi' ? 'सर्विस बाकी' : 'Service Due'}
+            </span>
+          )}
         </div>
       </div>
 
       {/* Fleet Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
-        {machines.map((machine) => {
+      {machines.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '40px 16px', background: '#ffffff', borderRadius: 20, border: '1px solid #edf2f7', color: '#64748b' }}>
+          <Tractor style={{ width: 44, height: 44, margin: '0 auto 12px', color: '#94a3b8' }} />
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#1e293b' }}>
+            {language === 'hi' ? 'कोई मशीन पंजीकृत नहीं' : 'No Machinery Registered'}
+          </h3>
+          <p style={{ fontSize: '0.78rem', marginTop: 4, marginBottom: 16 }}>
+            {language === 'hi' ? 'घंटे-मीटर, सर्विस काउंटडाउन और डीजल ऑडिट के लिए अपना ट्रैक्टर या जेसीबी जोड़ें' : 'Add your tractor, JCB, or harvester to track service intervals and fuel consumption'}
+          </p>
+          <button
+            onClick={onOpenAddMachine}
+            style={{
+              padding: '8px 18px',
+              borderRadius: 12,
+              background: '#2563eb',
+              color: '#ffffff',
+              border: 'none',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer'
+            }}
+          >
+            + {language === 'hi' ? 'नई मशीन जोड़ें' : 'Add Machine'}
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
+          {machines.map((machine) => {
           const isOverdue = machine.serviceHoursLeft <= 0;
           const isUrgent = machine.serviceHoursLeft > 0 && machine.serviceHoursLeft <= 20;
           const servicePercent = Math.min(100, Math.max(0, Math.round(((machine.serviceInterval - machine.serviceHoursLeft) / machine.serviceInterval) * 100)));
@@ -238,8 +263,8 @@ export default function FleetHealthView({ machines, onAddServiceNote, onOpenAddM
             </div>
           </div>
         </div>
-
       </div>
+    )}
 
     </div>
   );

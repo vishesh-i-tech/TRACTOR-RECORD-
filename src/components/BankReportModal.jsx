@@ -12,20 +12,21 @@ import {
 export default function BankReportModal({ 
   isOpen, 
   onClose, 
-  machines, 
-  customers, 
-  jobs, 
-  dieselLogs 
+  machines = [], 
+  customers = [], 
+  jobs = [], 
+  dieselLogs = [],
+  drivers = []
 }) {
   if (!isOpen) return null;
 
-  const totalRevenue = customers.reduce((sum, c) => sum + c.totalBilled, 0);
-  const totalReceived = customers.reduce((sum, c) => sum + c.totalPaid, 0);
-  const totalOutstanding = customers.reduce((sum, c) => sum + c.balance, 0);
+  const totalRevenue = customers.reduce((sum, c) => sum + (c.totalBilled || 0), 0);
+  const totalReceived = customers.reduce((sum, c) => sum + (c.totalPaid || 0), 0);
+  const totalOutstanding = customers.reduce((sum, c) => sum + (c.balance || 0), 0);
 
-  const totalDieselExpense = dieselLogs.reduce((sum, d) => sum + d.totalCost, 0);
-  const driverSalaries = 54900;
-  const maintenanceExpenses = 14200;
+  const totalDieselExpense = dieselLogs.reduce((sum, d) => sum + (d.totalCost || 0), 0);
+  const driverSalaries = drivers.reduce((sum, d) => sum + (d.bhattaBalance || 0), 0);
+  const maintenanceExpenses = 0;
 
   const totalExpenses = totalDieselExpense + driverSalaries + maintenanceExpenses;
   const netOperatingProfit = totalRevenue - totalExpenses;
@@ -64,7 +65,7 @@ export default function BankReportModal({
               🚜 Kisan Custom Hiring Centre (CHC)
             </div>
             <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: 2 }}>
-              Certified Seasonal Operating Profit & Loss Summary (Rabi Season 2026-27)
+              Certified Seasonal Operating Profit & Loss Summary
             </div>
             <span style={{ fontSize: '0.68rem', color: '#2563eb', fontFamily: 'var(--font-mono)', marginTop: 4, display: 'inline-block' }}>
               Date: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
@@ -117,28 +118,44 @@ export default function BankReportModal({
               <span style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748b', display: 'block' }}>
                 Net Operating Profit
               </span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '1.4rem', fontWeight: 800, color: '#10b981' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '1.4rem', fontWeight: 800, color: netOperatingProfit > 0 ? '#10b981' : netOperatingProfit < 0 ? '#dc2626' : '#0f172a' }}>
                 ₹{netOperatingProfit.toLocaleString('en-IN')}
               </span>
             </div>
-            <span className="badge-soft-green" style={{ padding: '4px 10px', borderRadius: 999, fontSize: '0.72rem', fontWeight: 700 }}>
-              Strong Margin
-            </span>
+            {netOperatingProfit > 0 ? (
+              <span className="badge-soft-green" style={{ padding: '4px 10px', borderRadius: 999, fontSize: '0.72rem', fontWeight: 700 }}>
+                Strong Margin
+              </span>
+            ) : netOperatingProfit < 0 ? (
+              <span style={{ padding: '4px 10px', borderRadius: 999, fontSize: '0.72rem', fontWeight: 700, background: '#fef2f2', color: '#dc2626', border: '1px solid #fee2e2' }}>
+                Operating Deficit
+              </span>
+            ) : (
+              <span style={{ padding: '4px 10px', borderRadius: 999, fontSize: '0.72rem', fontWeight: 700, background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' }}>
+                Balanced (₹0)
+              </span>
+            )}
           </div>
 
           <div>
             <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
               Asset Utilization Summary:
             </span>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {machines.map(m => (
-                <div key={m.id} style={{ padding: '6px 10px', borderRadius: 8, background: '#ffffff', border: '1px solid #edf2f7', display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                  <span style={{ fontWeight: 600, color: '#0f172a' }}>{m.name}</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', color: '#64748b' }}>
-                    Meter: <strong>{m.currentMeter.toFixed(1)} hrs</strong> | Burn: {m.expectedBurnRate} L/hr
-                  </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {machines.length === 0 ? (
+                <div style={{ padding: '12px 14px', borderRadius: 10, background: '#ffffff', border: '1px dashed #cbd5e1', textAlign: 'center', color: '#94a3b8', fontSize: '0.75rem' }}>
+                  No machines registered yet. Fleet records will appear here as machinery is added.
                 </div>
-              ))}
+              ) : (
+                machines.map(m => (
+                  <div key={m.id} style={{ padding: '6px 10px', borderRadius: 8, background: '#ffffff', border: '1px solid #edf2f7', display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                    <span style={{ fontWeight: 600, color: '#0f172a' }}>{m.name}</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: '#64748b' }}>
+                      Meter: <strong>{(m.currentMeter || 0).toFixed(1)} hrs</strong> | Burn: {m.expectedBurnRate || 0} L/hr
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 

@@ -249,3 +249,160 @@ export async function insertSupabaseMachine(machine) {
     return false;
   }
 }
+
+export async function insertSupabaseCustomer(customer) {
+  const client = getSupabaseClient();
+  if (!client) return false;
+
+  try {
+    const { error } = await client.from('customers').insert([{
+      id: customer.id,
+      name: customer.name,
+      village: customer.village || '',
+      phone: customer.phone || '',
+      trust_score: customer.trustScore ?? 80,
+      credit_limit: customer.creditLimit || 50000,
+      total_billed: customer.totalBilled || 0,
+      total_paid: customer.totalPaid || 0,
+      balance: customer.balance || 0,
+      mandi_day: customer.mandiDay || 'Monday',
+      barter_paid: customer.barterPaid || 'None',
+      last_job_date: customer.lastJobDate || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    }]);
+
+    if (error) console.warn('Supabase insert customer error:', error);
+    return !error;
+  } catch (err) {
+    console.warn('Supabase insertCustomer failed:', err);
+    return false;
+  }
+}
+
+// -------------------------------------------------------------
+// SQLite Client Service Methods (Next.js API route /api/db)
+// -------------------------------------------------------------
+
+export async function fetchSqliteSnapshot() {
+  try {
+    const res = await fetch('/api/db?type=all');
+    if (!res.ok) throw new Error('Failed to fetch from SQLite');
+    const json = await res.json();
+    if (json.success) return json;
+  } catch (err) {
+    console.warn('SQLite fetchSqliteSnapshot fallback:', err);
+  }
+  return null;
+}
+
+export async function fetchSqliteStats() {
+  try {
+    const res = await fetch('/api/db?type=stats');
+    if (!res.ok) throw new Error('Failed to fetch SQLite stats');
+    const json = await res.json();
+    if (json.success) return json.stats;
+  } catch (err) {
+    console.warn('SQLite fetchSqliteStats error:', err);
+  }
+  return null;
+}
+
+export async function insertSqliteCustomer(customer) {
+  try {
+    await fetch('/api/db', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'insert_customer', data: customer })
+    });
+  } catch (err) {
+    console.warn('SQLite insert customer error:', err);
+  }
+}
+
+export async function insertSqliteMachine(machine) {
+  try {
+    await fetch('/api/db', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'insert_machine', data: machine })
+    });
+  } catch (err) {
+    console.warn('SQLite insert machine error:', err);
+  }
+}
+
+export async function insertSqliteJob(job) {
+  try {
+    await fetch('/api/db', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'insert_job', data: job })
+    });
+  } catch (err) {
+    console.warn('SQLite insert job error:', err);
+  }
+}
+
+export async function insertSqliteDiesel(diesel) {
+  try {
+    await fetch('/api/db', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'insert_diesel', data: diesel })
+    });
+  } catch (err) {
+    console.warn('SQLite insert diesel error:', err);
+  }
+}
+
+export async function addSqlitePayment(customerId, amount, mode, barterDetail) {
+  try {
+    await fetch('/api/db', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        action: 'add_payment', 
+        data: { customerId, amount, mode, barterDetail } 
+      })
+    });
+  } catch (err) {
+    console.warn('SQLite add payment error:', err);
+  }
+}
+
+export async function insertSqliteDriver(driver) {
+  try {
+    const res = await fetch('/api/db', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'insert_driver', data: driver })
+    });
+    const json = await res.json();
+    return json?.data || driver;
+  } catch (err) {
+    console.warn('SQLite insert driver error:', err);
+    return driver;
+  }
+}
+
+export async function fetchSqliteRates() {
+  try {
+    const res = await fetch('/api/db?type=rates');
+    const json = await res.json();
+    if (json.success && json.rates) return json.rates;
+  } catch (err) {
+    console.warn('fetchSqliteRates error:', err);
+  }
+  return null;
+}
+
+export async function saveSqliteRates(rates) {
+  try {
+    await fetch('/api/db', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'save_rates', data: rates })
+    });
+  } catch (err) {
+    console.warn('saveSqliteRates error:', err);
+  }
+}

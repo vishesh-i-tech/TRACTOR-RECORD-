@@ -42,16 +42,26 @@ export function AuthProvider({ children }) {
   const [isSupabaseLive, setIsSupabaseLive] = useState(false);
   const [connectionMessage, setConnectionMessage] = useState('');
 
-  // Check Supabase session and initialize on mount
+  // Check session and initialize on mount
   useEffect(() => {
-    // Clear any legacy persistent auto-login so the user ALWAYS lands on the Authentication Page first!
+    let existingUser = null;
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('tr_is_authenticated');
-      localStorage.removeItem('tr_active_user');
-      sessionStorage.removeItem('tr_session_user');
+      const stored = sessionStorage.getItem('tr_session_user');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          // Purge legacy dummy mock accounts
+          if (parsed && parsed.email && !parsed.email.includes('farm.com') && !parsed.id?.startsWith('usr-owner-001')) {
+            existingUser = parsed;
+          } else {
+            sessionStorage.removeItem('tr_session_user');
+          }
+        } catch (e) {
+          sessionStorage.removeItem('tr_session_user');
+        }
+      }
     }
-    // Always start as unauthenticated so Authentication page displays first!
-    setUser(null);
+    setUser(existingUser);
 
     const initAuth = async () => {
       try {
@@ -73,9 +83,6 @@ export function AuthProvider({ children }) {
             setConnectionMessage('Supabase client initialized');
           }
 
-          // Unauthenticated by default: User must see Authentication (Sign In / Sign Up) Page first!
-          setUser(null);
-
           // Listen to auth changes if Supabase session alters
           const { data: authListener } = client.auth.onAuthStateChange((_event, newSession) => {
             setSession(newSession);
@@ -94,9 +101,6 @@ export function AuthProvider({ children }) {
           return () => {
             authListener?.subscription?.unsubscribe();
           };
-        } else {
-          // No live Supabase client: user must authenticate first
-          setUser(null);
         }
       } catch (err) {
         console.error('Error during Auth init:', err);
@@ -129,20 +133,24 @@ export function AuthProvider({ children }) {
       }
       return data;
     } else {
-      // Local demo sign in fallback
-      const foundDemo = Object.values(DEMO_USERS).find(u => u.email.toLowerCase() === email.toLowerCase());
-      const loggedUser = foundDemo || {
-        id: `usr-${Date.now()}`,
-        email,
-        name: email.split('@')[0],
-        role: 'owner',
-        avatar: email.substring(0, 2).toUpperCase()
-      };
-      setUser(loggedUser);
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('tr_session_user', JSON.stringify(loggedUser));
+      // Authenticate with local SQLite database
+      const res = await fetch('/api/db', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'auth_signin', data: { email, password } })
+      });
+      const result = await res.json();
+      if (!result.success) {
+        const err = new Error(result.error || 'Authentication failed');
+        err.code = result.code;
+        err.notFound = result.notFound;
+        throw err;
       }
-      return { user: loggedUser };
+      setUser(result.user);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('tr_session_user', JSON.stringify(result.user));
+      }
+      return result;
     }
   };
 
@@ -174,19 +182,27 @@ export function AuthProvider({ children }) {
       }
       return data;
     } else {
-      // Local demo sign up fallback
-      const newUser = {
-        id: `usr-${Date.now()}`,
-        email,
-        name: fullName || email.split('@')[0],
-        role: role,
-        avatar: (fullName || email).substring(0, 2).toUpperCase()
-      };
-      setUser(newUser);
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('tr_session_user', JSON.stringify(newUser));
+      // Register with local SQLite database
+      const res = await fetch('/api/db', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          action: 'auth_signup', 
+          data: { email, password, name: fullName, role } 
+        })
+      });
+      const result = await res.json();
+      if (!result.success) {
+        const err = new Error(result.error || 'Registration failed');
+        err.code = result.code;
+        err.alreadyExists = result.alreadyExists;
+        throw err;
       }
-      return { user: newUser };
+      setUser(result.user);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('tr_session_user', JSON.stringify(result.user));
+      }
+      return result;
     }
   };
 

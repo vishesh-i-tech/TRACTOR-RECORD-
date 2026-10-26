@@ -16,9 +16,9 @@ export default function WhatsAppInvoiceModal({ customer, job, isOpen, onClose })
 
   if (!isOpen || !customer) return null;
 
-  const currentBillAmount = job ? job.totalAmount : (customer.balance > 0 ? customer.balance : 3850);
-  const implementName = job ? job.implement : 'Rotavator / Field Tillage';
-  const unitsText = job ? `${job.units} ${job.billingType === 'Per Hour' ? 'Hours' : 'Acres'}` : '4.5 Hours';
+  const currentBillAmount = job ? (job.totalAmount || 0) : (customer.balance || 0);
+  const implementName = job ? job.implement : (customer.history && customer.history.length > 0 ? customer.history[0].implement : 'Khata Ledger Settlement');
+  const unitsText = job ? `${job.units} ${job.billingType === 'Per Hour' ? 'Hours' : job.billingType === 'Per Acre' ? 'Acres' : 'Units'}` : 'Direct Ledger';
   const dateStr = job ? job.date : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   const formattedBillText = `🚜 *TRACTOR RECORD - DIGITAL INVOICE*

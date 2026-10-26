@@ -41,14 +41,19 @@ export default function AuthModal({ isOpen, onClose, onOpenConfig, currentRole, 
 
   const handleRoleSwitch = (targetRole) => {
     if (setRole) setRole(targetRole);
-    demoLogin(targetRole);
+    if (user) {
+      const updated = { ...user, role: targetRole };
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('tr_session_user', JSON.stringify(updated));
+      }
+    }
     const roleTitle = targetRole === 'owner' 
       ? (language === 'hi' ? 'मालिक (Owner)' : 'Owner') 
       : targetRole === 'munshi' 
       ? (language === 'hi' ? 'मुंशी (Accountant)' : 'Accountant') 
       : (language === 'hi' ? 'ड्राइवर (Driver)' : 'Driver');
 
-    setSuccessMsg(language === 'hi' ? `${roleTitle} खाते में स्विच हो गया!` : `Switched to ${roleTitle} account!`);
+    setSuccessMsg(language === 'hi' ? `${roleTitle} मोड में स्विच हो गया!` : `Switched to ${roleTitle} role!`);
     setTimeout(() => {
       onClose();
     }, 450);
@@ -81,7 +86,6 @@ export default function AuthModal({ isOpen, onClose, onOpenConfig, currentRole, 
     {
       id: 'owner',
       title: language === 'hi' ? 'फार्म व फ्लीट मालिक' : 'Farm & Fleet Owner',
-      name: 'Surinder Thakur',
       icon: '👑',
       desc: language === 'hi' 
         ? 'पूर्ण वित्तीय नियंत्रण: किसान खाता बही, फ्लीट मॉनिटरिंग, डीजल ऑडिट व बैंक P&L' 
@@ -92,7 +96,6 @@ export default function AuthModal({ isOpen, onClose, onOpenConfig, currentRole, 
     {
       id: 'munshi',
       title: language === 'hi' ? 'मुंशी / लेखाकार' : 'Accountant (Munshi)',
-      name: 'Radhe Shyam',
       icon: '📋',
       desc: language === 'hi' 
         ? 'दैनिक प्रविष्टियां: खेत कार्य लॉग, डीजल पर्ची व व्हाट्सएप इनवॉइस' 
@@ -103,7 +106,6 @@ export default function AuthModal({ isOpen, onClose, onOpenConfig, currentRole, 
     {
       id: 'driver',
       title: language === 'hi' ? 'मशीन चालक (ड्राइवर मोड)' : 'Machine Driver (Driver Mode)',
-      name: 'Sukhwinder Singh',
       icon: '🚜',
       desc: language === 'hi' 
         ? 'चालक कंसोल: आसान मीटर रीडिंग, डीजल रसीद फोटो व कार्य स्थिति' 
@@ -284,9 +286,6 @@ export default function AuthModal({ isOpen, onClose, onOpenConfig, currentRole, 
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
                             <span style={{ fontWeight: 800, fontSize: '0.88rem', color: '#0f172a' }}>
                               {p.title}
-                            </span>
-                            <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>
-                              • {p.name}
                             </span>
                           </div>
                           <div style={{ fontSize: '0.72rem', color: '#64748b', lineHeight: 1.35 }}>
@@ -501,7 +500,7 @@ export default function AuthModal({ isOpen, onClose, onOpenConfig, currentRole, 
                   transition: 'all 0.15s ease'
                 }}
               >
-                {language === 'hi' ? 'खाता बनाएं' : 'Create Account'}
+                {language === 'hi' ? 'साइन अप' : 'Sign Up'}
               </button>
             </div>
 
@@ -515,7 +514,7 @@ export default function AuthModal({ isOpen, onClose, onOpenConfig, currentRole, 
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. Surinder Thakur"
+                      placeholder="Full Name"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       style={{ width: '100%', padding: '10px 12px', borderRadius: 10, background: '#f8fafc', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none' }}
@@ -546,7 +545,7 @@ export default function AuthModal({ isOpen, onClose, onOpenConfig, currentRole, 
                 </label>
                 <input
                   type="email"
-                  placeholder="surinder@tractorrecord.com"
+                  placeholder="Email or Mobile"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   style={{ width: '100%', padding: '10px 12px', borderRadius: 10, background: '#f8fafc', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none' }}
@@ -584,40 +583,10 @@ export default function AuthModal({ isOpen, onClose, onOpenConfig, currentRole, 
                 {loading 
                   ? 'Authenticating...' 
                   : tab === 'login' 
-                  ? (language === 'hi' ? 'लॉगिन करें' : 'Sign In') 
-                  : (language === 'hi' ? 'खाता बनाएं' : 'Register Account')}
+                  ? (language === 'hi' ? 'साइन इन' : 'Sign In') 
+                  : (language === 'hi' ? 'साइन अप' : 'Sign Up')}
               </button>
             </form>
-
-            {/* 1-Click Instant Demo Profiles */}
-            <div style={{ marginTop: 18, paddingTop: 14, borderTop: '1px solid #edf2f7' }}>
-              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: 8 }}>
-                {language === 'hi' ? '1-क्लिक डेमो प्रोफाइल:' : 'Instant 1-Click Demo Profiles:'}
-              </span>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                <button
-                  type="button"
-                  onClick={() => handleRoleSwitch('owner')}
-                  style={{ padding: '8px 6px', borderRadius: 10, background: '#f8fafc', border: '1px solid #e2e8f0', fontSize: '0.72rem', fontWeight: 700, color: '#1e40af', cursor: 'pointer', textAlign: 'center' }}
-                >
-                  👑 Owner
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRoleSwitch('munshi')}
-                  style={{ padding: '8px 6px', borderRadius: 10, background: '#f8fafc', border: '1px solid #e2e8f0', fontSize: '0.72rem', fontWeight: 700, color: '#d97706', cursor: 'pointer', textAlign: 'center' }}
-                >
-                  📋 Munshi
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRoleSwitch('driver')}
-                  style={{ padding: '8px 6px', borderRadius: 10, background: '#f8fafc', border: '1px solid #e2e8f0', fontSize: '0.72rem', fontWeight: 700, color: '#0284c7', cursor: 'pointer', textAlign: 'center' }}
-                >
-                  🚜 Driver
-                </button>
-              </div>
-            </div>
           </div>
         )}
 
