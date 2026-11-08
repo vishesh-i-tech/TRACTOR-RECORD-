@@ -7,4 +7,4 @@ export function isValidUrl(str) {
   try { new URL(str); return true; } catch { return false; }
 }
 
-// Revision 5 - 2026-11-09
+// Revision 38 - 2026-11-09
