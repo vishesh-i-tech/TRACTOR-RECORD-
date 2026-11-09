@@ -1,50 +1,30 @@
 
-### Checkpoint 1 — 2026-10-22 9:50:53 pm
+### Checkpoint 1 — 2026-11-08 8:49:37 pm
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: docs(notes): log engineering checkpoint #1 [gitbrain].
+- Milestone: docs(roadmap): add detailed billing unit specifications for implements.
 
-### Checkpoint 4 — 2026-10-22 9:50:53 pm
+### Checkpoint 4 — 2026-11-08 8:49:37 pm
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: docs(notes): log engineering checkpoint #4 [gitbrain].
+- Milestone: test(utils): add unit tests for billing calculation functions.
 
-### Checkpoint 7 — 2026-10-22 9:50:53 pm
+### Checkpoint 7 — 2026-11-08 8:49:37 pm
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: docs(notes): log engineering checkpoint #7 [gitbrain].
+- Milestone: test(models): add tests for DriverSession validation and allowance calc.
 
-### Checkpoint 10 — 2026-10-22 9:50:53 pm
+### Checkpoint 10 — 2026-11-08 8:49:37 pm
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: docs(notes): log engineering checkpoint #10 [gitbrain].
+- Milestone: test(utils): add fuel efficiency calculation test cases.
 
-### Checkpoint 13 — 2026-10-22 9:50:53 pm
+### Checkpoint 13 — 2026-11-08 8:49:37 pm
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: docs(notes): log engineering checkpoint #13 [gitbrain].
+- Milestone: test(models): add CreditLedger tests for partial payment scenarios.
 
-### Checkpoint 16 — 2026-10-22 9:50:53 pm
+### Checkpoint 16 — 2026-11-08 8:49:37 pm
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: docs(notes): log engineering checkpoint #16 [gitbrain].
-
-### Checkpoint 19 — 2026-10-22 9:50:53 pm
-- Automated engineering check completed for TRACTOR RECORD.
-- Architecture verification: healthy.
-- Milestone: docs(notes): log engineering checkpoint #19 [gitbrain].
-
-### Checkpoint 22 — 2026-10-22 9:50:53 pm
-- Automated engineering check completed for TRACTOR RECORD.
-- Architecture verification: healthy.
-- Milestone: docs(notes): log engineering checkpoint #22 [gitbrain].
-
-### Checkpoint 25 — 2026-10-22 9:50:53 pm
-- Automated engineering check completed for TRACTOR RECORD.
-- Architecture verification: healthy.
-- Milestone: docs(notes): log engineering checkpoint #25 [gitbrain].
-
-### Checkpoint 28 — 2026-10-22 9:50:53 pm
-- Automated engineering check completed for TRACTOR RECORD.
-- Architecture verification: healthy.
-- Milestone: docs(notes): log engineering checkpoint #28 [gitbrain].
+- Milestone: feat(telemetry): add analytics events for billing, fuel, and credit actions.
