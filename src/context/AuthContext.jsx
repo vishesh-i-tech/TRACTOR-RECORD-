@@ -112,97 +112,120 @@ export function AuthProvider({ children }) {
     initAuth();
   }, []);
 
+  // Local SQLite authentication helpers
+  const localSignIn = async (email, password) => {
+    const res = await fetch('/api/db', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'auth_signin', data: { email, password } })
+    });
+    const result = await res.json();
+    if (!result.success) {
+      const err = new Error(result.error || 'Authentication failed');
+      err.code = result.code;
+      err.notFound = result.notFound;
+      throw err;
+    }
+    setUser(result.user);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('tr_session_user', JSON.stringify(result.user));
+    }
+    return result;
+  };
+
+  const localSignUp = async (email, password, fullName, role = 'owner') => {
+    const res = await fetch('/api/db', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        action: 'auth_signup', 
+        data: { email, password, name: fullName, role } 
+      })
+    });
+    const result = await res.json();
+    if (!result.success) {
+      const err = new Error(result.error || 'Registration failed');
+      err.code = result.code;
+      err.alreadyExists = result.alreadyExists;
+      throw err;
+    }
+    setUser(result.user);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('tr_session_user', JSON.stringify(result.user));
+    }
+    return result;
+  };
+
   // Sign In with email & password
   const signIn = async (email, password) => {
     const client = getSupabaseClient();
-    if (client) {
-      const { data, error } = await client.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      if (data?.user) {
-        const u = {
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || 'User',
-          role: data.user.user_metadata?.role || 'owner',
-          avatar: (data.user.user_metadata?.full_name || 'U').substring(0, 2).toUpperCase()
-        };
-        setUser(u);
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('tr_session_user', JSON.stringify(u));
+    if (client && isSupabaseLive) {
+      try {
+        const { data, error } = await client.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        if (data?.user) {
+          const u = {
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || 'User',
+            role: data.user.user_metadata?.role || 'owner',
+            avatar: (data.user.user_metadata?.full_name || 'U').substring(0, 2).toUpperCase()
+          };
+          setUser(u);
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('tr_session_user', JSON.stringify(u));
+          }
         }
-      }
-      return data;
-    } else {
-      // Authenticate with local SQLite database
-      const res = await fetch('/api/db', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'auth_signin', data: { email, password } })
-      });
-      const result = await res.json();
-      if (!result.success) {
-        const err = new Error(result.error || 'Authentication failed');
-        err.code = result.code;
-        err.notFound = result.notFound;
+        return data;
+      } catch (err) {
+        if (err.message && (err.message.includes('fetch') || err.message.includes('network') || err.message.includes('NetworkError'))) {
+          console.warn('Supabase signin offline, falling back to local SQLite:', err.message);
+          return await localSignIn(email, password);
+        }
         throw err;
       }
-      setUser(result.user);
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('tr_session_user', JSON.stringify(result.user));
-      }
-      return result;
+    } else {
+      return await localSignIn(email, password);
     }
   };
 
   // Sign Up with email, password, full name, and role
   const signUp = async (email, password, fullName, role = 'owner') => {
     const client = getSupabaseClient();
-    if (client) {
-      const { data, error } = await client.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            role: role
+    if (client && isSupabaseLive) {
+      try {
+        const { data, error } = await client.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+              role: role
+            }
           }
+        });
+        if (error) throw error;
+        const u = {
+          id: data?.user?.id || `usr-${Date.now()}`,
+          email,
+          name: fullName,
+          role,
+          avatar: (fullName || 'U').substring(0, 2).toUpperCase()
+        };
+        setUser(u);
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('tr_session_user', JSON.stringify(u));
         }
-      });
-      if (error) throw error;
-      const u = {
-        id: data?.user?.id || `usr-${Date.now()}`,
-        email,
-        name: fullName,
-        role,
-        avatar: (fullName || 'U').substring(0, 2).toUpperCase()
-      };
-      setUser(u);
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('tr_session_user', JSON.stringify(u));
-      }
-      return data;
-    } else {
-      // Register with local SQLite database
-      const res = await fetch('/api/db', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          action: 'auth_signup', 
-          data: { email, password, name: fullName, role } 
-        })
-      });
-      const result = await res.json();
-      if (!result.success) {
-        const err = new Error(result.error || 'Registration failed');
-        err.code = result.code;
-        err.alreadyExists = result.alreadyExists;
+        return data;
+      } catch (err) {
+        if (err.message && (err.message.includes('fetch') || err.message.includes('network') || err.message.includes('NetworkError'))) {
+          console.warn('Supabase signup offline, falling back to local SQLite:', err.message);
+          return await localSignUp(email, password, fullName, role);
+        }
         throw err;
       }
-      setUser(result.user);
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('tr_session_user', JSON.stringify(result.user));
-      }
-      return result;
+    } else {
+      return await localSignUp(email, password, fullName, role);
     }
   };
 

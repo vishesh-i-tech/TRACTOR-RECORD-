@@ -13,6 +13,14 @@ let currentConfig = {
 // Check if credentials are valid format
 export function isValidSupabaseConfig(url, key) {
   if (!url || !key) return false;
+  if (
+    url.includes('your-project') || 
+    url.includes('placeholder') || 
+    key.includes('your-anon-key') || 
+    key.includes('your-key')
+  ) {
+    return false;
+  }
   return (
     url.startsWith('https://') &&
     url.includes('.supabase.co') &&

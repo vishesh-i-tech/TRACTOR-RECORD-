@@ -19,7 +19,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function AuthView({ onOpenSupabaseConfig }) {
-  const { signIn, signUp, isSupabaseLive } = useAuth();
+  const { signIn, signUp, demoLogin, isSupabaseLive } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const [tab, setTab] = useState('login'); // 'login' | 'signup'
   const [email, setEmail] = useState('');
@@ -301,6 +301,78 @@ export default function AuthView({ onOpenSupabaseConfig }) {
             )}
           </div>
         </form>
+
+        {/* Instant 1-Click Demo Profiles */}
+        <div style={{ marginTop: 18, paddingTop: 14, borderTop: '1px solid #f1f5f9' }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textAlign: 'center', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            ⚡ {language === 'hi' ? 'तुरंत 1-क्लिक डेमो लॉगिन' : 'Or Instant 1-Click Demo Access'}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+            <button
+              type="button"
+              onClick={() => demoLogin('owner')}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: '10px 4px',
+                borderRadius: 12,
+                border: '1px solid #bfdbfe',
+                background: '#eff6ff',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <span style={{ fontSize: '1.25rem' }}>👑</span>
+              <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#1e40af', marginTop: 4 }}>
+                {language === 'hi' ? 'मालिक' : 'Owner'}
+              </span>
+              <span style={{ fontSize: '0.62rem', color: '#3b82f6' }}>Surinder</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => demoLogin('munshi')}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: '10px 4px',
+                borderRadius: 12,
+                border: '1px solid #a7f3d0',
+                background: '#ecfdf5',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <span style={{ fontSize: '1.25rem' }}>📋</span>
+              <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#065f46', marginTop: 4 }}>
+                {language === 'hi' ? 'मुंशी' : 'Munshi'}
+              </span>
+              <span style={{ fontSize: '0.62rem', color: '#059669' }}>Radhe</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => demoLogin('driver')}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: '10px 4px',
+                borderRadius: 12,
+                border: '1px solid #fde68a',
+                background: '#fffbeb',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <span style={{ fontSize: '1.25rem' }}>🚜</span>
+              <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#92400e', marginTop: 4 }}>
+                {language === 'hi' ? 'ड्राइवर' : 'Driver'}
+              </span>
+              <span style={{ fontSize: '0.62rem', color: '#d97706' }}>Sukhwinder</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Feature Highlights Footer */}
