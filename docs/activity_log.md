@@ -23,3 +23,8 @@
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
 - Milestone: feat(types): implement CreditAccount, PartialPayment, and AdvancePayment types.
+
+### Checkpoint 16 — 2026-11-13 8:13:58 am
+- Automated engineering check completed for TRACTOR RECORD.
+- Architecture verification: healthy.
+- Milestone: feat(utils): implement driver daily allowance (bhatta) calculation with overtime rules.
