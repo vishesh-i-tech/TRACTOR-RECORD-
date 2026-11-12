@@ -18,3 +18,8 @@
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
 - Milestone: feat(types): define TypeScript interfaces for Implement, BillingUnit, and HourMeterReading.
+
+### Checkpoint 13 — 2026-11-13 8:13:58 am
+- Automated engineering check completed for TRACTOR RECORD.
+- Architecture verification: healthy.
+- Milestone: feat(types): implement CreditAccount, PartialPayment, and AdvancePayment types.
