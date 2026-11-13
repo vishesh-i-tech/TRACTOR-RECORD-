@@ -1,13 +1,12 @@
-// Utility: Memoization utility
 export function memoize(fn) {
   const cache = new Map();
-  return (...args) => {
+  const memoized = (...args) => {
     const key = JSON.stringify(args);
     if (cache.has(key)) return cache.get(key);
     const result = fn(...args);
     cache.set(key, result);
     return result;
   };
+  memoized.clear = () => cache.clear();
+  return memoized;
 }
-
-// Revision 29 - 2026-11-12
