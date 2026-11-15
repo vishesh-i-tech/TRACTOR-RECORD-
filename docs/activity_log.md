@@ -38,3 +38,8 @@
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
 - Milestone: feat(api): implement fuel log submission endpoint with validation.
+
+### Checkpoint 25 — 2026-11-15 7:05:23 pm
+- Automated engineering check completed for TRACTOR RECORD.
+- Architecture verification: healthy.
+- Milestone: refactor(utils): extract shared date formatting helpers to date-utils.ts.
