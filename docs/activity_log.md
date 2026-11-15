@@ -23,3 +23,8 @@
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
 - Milestone: feat(fuel): add FuelLog entry type with meter reading and timestamp.
+
+### Checkpoint 16 — 2026-11-15 7:05:23 pm
+- Automated engineering check completed for TRACTOR RECORD.
+- Architecture verification: healthy.
+- Milestone: docs(fuel): document diesel theft prevention strategy in architecture_notes_part_5.md.
