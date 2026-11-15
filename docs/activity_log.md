@@ -43,3 +43,8 @@
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
 - Milestone: refactor(utils): extract shared date formatting helpers to date-utils.ts.
+
+### Checkpoint 28 — 2026-11-15 7:05:23 pm
+- Automated engineering check completed for TRACTOR RECORD.
+- Architecture verification: healthy.
+- Milestone: docs(android): document driver tracking foreground service in android/README.md.
