@@ -1,12 +1,14 @@
-export function memoize(fn) {
+export function memoize(fn, { serializer = JSON.stringify, maxSize = Infinity } = {}) {
   const cache = new Map();
-  const memoized = (...args) => {
-    const key = JSON.stringify(args);
+  return (...args) => {
+    const key = serializer(args);
     if (cache.has(key)) return cache.get(key);
+    if (cache.size >= maxSize) {
+      const firstKey = cache.keys().next().value;
+      cache.delete(firstKey);
+    }
     const result = fn(...args);
     cache.set(key, result);
     return result;
   };
-  memoized.clear = () => cache.clear();
-  return memoized;
 }
