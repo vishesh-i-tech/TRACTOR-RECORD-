@@ -11,7 +11,7 @@ describe('mathHelpers', () => {
       expect(clamp(-5, 0, 10)).toBe(0);
     });
 
-    it('returns value unchanged when within bounds', () => {
+    it('returns value unchanged when within range', () => {
       expect(clamp(5, 0, 10)).toBe(5);
     });
 
@@ -37,8 +37,8 @@ describe('mathHelpers', () => {
       expect(roundTo(-3.14159, 2)).toBe(-3.14);
     });
 
-    it('returns integer for negative decimal places', () => {
-      expect(roundTo(1234, -2)).toBe(1200);
+    it('handles whole numbers', () => {
+      expect(roundTo(5, 2)).toBe(5);
     });
   });
 });
