@@ -18,3 +18,8 @@
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
 - Milestone: test(utils): add unit tests for per-acre and per-bigha calculations.
+
+### Checkpoint 13 — 2026-11-16 2:09:30 pm
+- Automated engineering check completed for TRACTOR RECORD.
+- Architecture verification: healthy.
+- Milestone: feat(models): create Driver/Operator entity with daily allowance (bhatta) tracking.
