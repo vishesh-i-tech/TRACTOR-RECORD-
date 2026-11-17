@@ -43,3 +43,8 @@
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
 - Milestone: test(utils): add tests for advance adjustment calculations.
+
+### Checkpoint 28 — 2026-11-17 9:56:21 pm
+- Automated engineering check completed for TRACTOR RECORD.
+- Architecture verification: healthy.
+- Milestone: ci(github): add GitHub Actions workflow for lint, typecheck, and test.
