@@ -38,3 +38,8 @@
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
 - Milestone: docs(architecture): create part 7 architecture notes for offline-first sync.
+
+### Checkpoint 25 — 2026-11-19 10:07:30 pm
+- Automated engineering check completed for TRACTOR RECORD.
+- Architecture verification: healthy.
+- Milestone: test(sync): add e2e tests for offline rental creation and sync.
