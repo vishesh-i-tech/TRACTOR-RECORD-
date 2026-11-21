@@ -38,3 +38,8 @@
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
 - Milestone: feat(services): implement fuel log service with consumption tracking.
+
+### Checkpoint 25 — 2026-11-21 8:38:42 pm
+- Automated engineering check completed for TRACTOR RECORD.
+- Architecture verification: healthy.
+- Milestone: chore(config): configure Next.js for offline-first PWA with service worker.
