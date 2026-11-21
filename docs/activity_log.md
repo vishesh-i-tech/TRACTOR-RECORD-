@@ -43,3 +43,8 @@
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
 - Milestone: chore(config): configure Next.js for offline-first PWA with service worker.
+
+### Checkpoint 28 — 2026-11-21 8:38:42 pm
+- Automated engineering check completed for TRACTOR RECORD.
+- Architecture verification: healthy.
+- Milestone: feat(telemetry): add structured logging for billing calculations and fuel events.
