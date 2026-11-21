@@ -18,3 +18,8 @@
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
 - Milestone: feat(types): define credit transaction types for partial payments and advances.
+
+### Checkpoint 13 — 2026-11-21 8:38:42 pm
+- Automated engineering check completed for TRACTOR RECORD.
+- Architecture verification: healthy.
+- Milestone: feat(utils): add fuel efficiency calculation and anomaly detection helpers.
