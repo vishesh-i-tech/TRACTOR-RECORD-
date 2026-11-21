@@ -13,3 +13,8 @@
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
 - Milestone: feat(types): define core domain types for implements, billing units, and meter readings.
+
+### Checkpoint 10 — 2026-11-21 8:38:42 pm
+- Automated engineering check completed for TRACTOR RECORD.
+- Architecture verification: healthy.
+- Milestone: feat(types): define credit transaction types for partial payments and advances.
