@@ -1,49 +1,49 @@
-### Checkpoint 1 — 2026-11-16 14:09:30
+### Checkpoint 1 — 2026-11-21 20:38:42
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: docs(roadmap): initialize project specification and milestone tracking.
+- Milestone: docs(roadmap): initialize project roadmap with pain points and milestones.
 
-### Checkpoint 4 — 2026-11-16 14:09:30
+### Checkpoint 4 — 2026-11-21 20:38:42
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: feat(types): add BillingUnit enum (hour, acre, bigha, trip) and RateCard type.
+- Milestone: docs(architecture): add part 7 architecture notes for fuel monitoring system.
 
-### Checkpoint 7 — 2026-11-16 14:09:30
+### Checkpoint 7 — 2026-11-21 20:38:42
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: feat(utils): implement per-trip billing logic for trolley and transport implements.
+- Milestone: feat(types): define core domain types for implements, billing units, and meter readings.
 
-### Checkpoint 10 — 2026-11-16 14:09:30
+### Checkpoint 10 — 2026-11-21 20:38:42
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: test(utils): add unit tests for per-acre and per-bigha calculations.
+- Milestone: feat(types): define credit transaction types for partial payments and advances.
 
-### Checkpoint 13 — 2026-11-16 14:09:30
+### Checkpoint 13 — 2026-11-21 20:38:42
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: feat(models): create Driver/Operator entity with daily allowance (bhatta) tracking.
+- Milestone: feat(utils): add fuel efficiency calculation and anomaly detection helpers.
 
-### Checkpoint 16 — 2026-11-16 14:09:30
+### Checkpoint 16 — 2026-11-21 20:38:42
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: feat(utils): add fuel efficiency calculator (liters per hour/acre).
+- Milestone: test(utils): add unit tests for billing calculation across all unit types.
 
-### Checkpoint 19 — 2026-11-16 14:09:30
+### Checkpoint 19 — 2026-11-21 20:38:42
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: test(models): add tests for fuel log validation and anomaly detection.
+- Milestone: test(utils): add tests for credit reconciliation scenarios.
 
-### Checkpoint 22 — 2026-11-16 14:09:30
+### Checkpoint 22 — 2026-11-21 20:38:42
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: feat(telemetry): add structured logging for rental session lifecycle events.
+- Milestone: feat(services): implement fuel log service with consumption tracking.
 
-### Checkpoint 25 — 2026-11-16 14:09:30
+### Checkpoint 25 — 2026-11-21 20:38:42
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: refactor(utils): extract billing strategy pattern for extensible rate calculations.
+- Milestone: chore(config): configure Next.js for offline-first PWA with service worker.
 
-### Checkpoint 28 — 2026-11-16 14:09:30
+### Checkpoint 28 — 2026-11-21 20:38:42
 - Automated engineering check completed for TRACTOR RECORD.
 - Architecture verification: healthy.
-- Milestone: chore(lint): add ESLint rules for consistent async/await and error handling.
+- Milestone: feat(telemetry): add structured logging for billing calculations and fuel events.
